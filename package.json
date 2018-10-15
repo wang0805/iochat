@@ -1,0 +1,24 @@
+{
+  "name": "iochat",
+  "version": "1.0.0",
+  "description": "making chatroom with socket",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wang0805/iochat.git"
+  },
+  "author": "wenhao",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wang0805/iochat/issues"
+  },
+  "homepage": "https://github.com/wang0805/iochat#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "socket.io": "^2.1.1"
+  }
+}

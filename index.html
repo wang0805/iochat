@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>iochat</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<script
+	  src="https://code.jquery.com/jquery-3.3.1.js"
+	  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+	  crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+	<script src="/socket.io/socket.io.js"></script>	
+	<style>
+		body {
+			margin-top: 30px;
+		}
+		.well {
+			margin: 20px auto;
+			background-color: #DCDCDC;
+			padding: 20px;
+			border-radius: 5px
+		}
+		#messageArea {
+			display:none;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div id="userFormArea" class="row">
+			<div class="col-md-12">
+				<form id="userForm">
+					<div class="form-group">
+						<label>Enter Username</label>
+						<input class="form-control" id="username"/>
+						<br />
+						<input type="submit" class="btn btn-primary" value="login" />
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row" id="messageArea">
+			<div class="col-md-4">
+				<div class="well">
+					<h3>online users</h3>
+					<ul class="list-group" id="users"></ul>
+				</div>
+			</div>
+			<div class="col-md-8">
+				<div class="chat" id="chat"></div>
+
+				<form id="messageForm">
+					<div class="form-group">
+						<label>Enter Message</label>
+						<textarea class="form-control" id="message"></textarea>
+						<br />
+						<input type="submit" class="btn btn-primary" value="Send message" />
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+
+	<script>
+		$(function(){
+			var socket = io.connect();
+			//$ on var to make a distinction btwn regular vars and jquery objs
+			var $messageForm = $('#messageForm');
+			var $message = $('#message');
+			var $chat = $('#chat');
+			var $messageArea = $('#messageArea');
+			var $userForm = $('#userForm');
+			var $userFormArea = $('#userFormArea');
+			var $users = $('#users');
+			var $userName = $('#username');
+
+
+			$messageForm.submit((e)=>{
+				e.preventDefault();
+				socket.emit('send message', $message.val());
+				$message.val('');
+			})
+
+			socket.on('new message', (data)=>{
+				//append = appendChild for jquery
+				$chat.append(`<div class="well"><strong>${data.user}: </strong>${data.msg}</div>`);
+			})
+
+			$userForm.submit((e)=>{
+				e.preventDefault();
+				socket.emit('new user', $userName.val(), (data)=>{
+					if(data){
+						$userFormArea.hide();
+						$messageArea.show();
+					}
+				});
+				$userName.val('');
+			})
+
+			socket.on('get users', (data) => {
+				var html = '';
+				for(i=0;i<data.length;i++){
+					html += '<li class="list-group-item">'+data[i]+'</li>';
+				}
+				$users.html(html);
+			})
+		})
+
+	</script>
+</body>
+</html>
